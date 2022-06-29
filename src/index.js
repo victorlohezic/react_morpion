@@ -6,16 +6,13 @@ function Square(props) {
     return (
         <button className={"square"} style={props.isWinner ? { backgroundColor: '#1b9e3e', color: 'white' } : { backgroundColor: 'white' }} onClick={props.onClick}>
                 {props.value}
-                {console.log("" + props.isWinner)}
+                      {console.log("" + props.isWinner)}
         </button>
     );
 }
 
 class Board extends React.Component {
     renderSquare(i) {
-        // if (this.props.line_winner) {
-        //     console.log(this.props.line_winner.indexOf(i)>=0);
-        // }
         return (
             <Square
                 value={this.props.squares[i]}
@@ -66,7 +63,8 @@ class Game extends React.Component {
             }],
             stepNumber: 0,
             xIsNext: true,
-            isAscending: true
+            isAscending: true, 
+            isDraw: false
         };
     }
 
@@ -87,7 +85,10 @@ class Game extends React.Component {
             }]),
             stepNumber: history.length,
             xIsNext: !this.state.xIsNext,
+            isDraw: computeIsDraw(squares)
         });
+        console.log("handle" + this.state.isDraw);
+        console.log("handle compute" + computeIsDraw(squares));
     }
 
     jumpTo(step) {
@@ -122,8 +123,11 @@ class Game extends React.Component {
         });
 
         let status;
-        if (winner) {
+        console.log("render" + this.state.isDraw);
+        if (winner && !this.state.isDraw) {
             status = 'Gagnant : ' + winner;
+        } else if (this.state.isDraw) {
+            status = 'Draw';
         } else {
             status = 'Prochain joueur : ' + (this.state.xIsNext ? 'X' : 'O');
         }
@@ -180,4 +184,16 @@ function getX(i, y) {
 
 function getY(i) {
     return i % 3 + 1;
+}
+
+function computeIsDraw(squares) {
+    console.log(squares);
+    let isDraw = true
+    squares.forEach((elt) => {
+        console.log(elt);
+        if (elt === null) {
+            isDraw = false;
+        }}
+    );
+    return isDraw;
 }
