@@ -25,12 +25,28 @@ class Board extends React.Component {
         for (let i = 0; i < 3; ++i) {
             let col = [];
             for (let j = 0; j < 3; ++j) {
-                col.push(this.renderSquare(j + 3 *i));
+                col.push(this.renderSquare(j + 3 * i));
             }
-            row.push(<div key={i} className="board-row">{col}</div>);
+            row.push(<div key={"board-"+i} className="board-row">{col}</div>);
         }
         return (
             <div>{row}</div>
+        );
+    }
+}
+
+class ToggleButton extends React.Component {
+    
+    render() {
+        return (
+            <form onSubmit={this.handleSubmit}>
+                Trier par ordre décroissant
+                <label className="switch">
+                    <input type="checkbox" onChange={this.props.toggleClick} />
+                    <span className="slider round"></span>
+                </label>
+
+            </form>
         );
     }
 }
@@ -44,7 +60,8 @@ class Game extends React.Component {
                 coords: Array(2).fill(null)
             }],
             stepNumber: 0,
-            xIsNext: true
+            xIsNext: true,
+            isAscending: true
         };
     }
 
@@ -52,6 +69,8 @@ class Game extends React.Component {
         const history = this.state.history;
         const current = history[this.state.stepNumber];
         const squares = current.squares.slice();
+        const y = getY(i);
+        const x = getX(i, y);
         if (calculateWinner(squares) || squares[i]) {
             return;
         }
@@ -59,7 +78,7 @@ class Game extends React.Component {
         this.setState({
             history: history.concat([{
                 squares: squares,
-                coords: [getX(i), getY(i)]
+                coords: [x, y]
             }]),
             stepNumber: history.length,
             xIsNext: !this.state.xIsNext,
@@ -73,17 +92,24 @@ class Game extends React.Component {
         });
     }
 
+    toggleClick() {
+        this.setState({
+            isAscending: !this.state.isAscending
+        });
+    }
+
     render() {
-        const history = this.state.history.slice(0, this.state.stepNumber + 1);
+        let history = this.state.history.slice(0, this.state.stepNumber + 1);
         const current = history[history.length - 1];
         const winner = calculateWinner(current.squares);
         const moves = history.map((step, move) => {
+            move = this.state.isAscending ? move : history.length-1 - move;
             const desc = move ?
                 'Revenir au tour n°' + move :
                 'Revenir au début de la partie';
             return (
                 <li key={move} className={move === this.state.stepNumber ? "current_elt_history" : ""}>
-                    <button onClick={() => this.jumpTo(move)}>{desc}</button><span>{history[move].coords[0] ? `(${history[move].coords[0]}, ${history[move].coords[1]})` : ""}</span>
+                    <button onClick={() => this.jumpTo(move)}>{desc}</button><span>{history[move].coords[0] !== null ? `(${history[move].coords[0]}, ${history[move].coords[1]})` : ""}</span>
                 </li>
             )
         });
@@ -104,8 +130,11 @@ class Game extends React.Component {
                     />
                 </div>
                 <div className="game-info">
+                    <ToggleButton 
+                        toggleClick={() => this.toggleClick()}
+                    />
                     <div>{status}</div>
-                    <ol>{moves}</ol>
+                    <ul>{moves}</ul>
                 </div>
             </div>
         );
@@ -137,10 +166,10 @@ function calculateWinner(squares) {
     return null;
 }
 
-function getX(i) {
-    return i % 3 + 1;
+function getX(i, y) {
+    return Math.round((i-y)/3)+1;
 }
 
 function getY(i) {
-    return Math.round(i / 3);
+    return i % 3 + 1;
 }
