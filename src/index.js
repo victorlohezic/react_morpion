@@ -5,8 +5,8 @@ import './index.css';
 function Square(props) {
     return (
         <button className={"square"} style={props.isWinner ? { backgroundColor: '#1b9e3e', color: 'white' } : { backgroundColor: 'white' }} onClick={props.onClick}>
-                {props.value}
-                      {console.log("" + props.isWinner)}
+            {props.value}
+            {console.log("" + props.isWinner)}
         </button>
     );
 }
@@ -63,14 +63,14 @@ class Game extends React.Component {
             }],
             stepNumber: 0,
             xIsNext: true,
-            isAscending: true, 
+            isAscending: true,
             isDraw: false
         };
     }
 
     handleClick(i) {
-        const history = this.state.history;
-        const current = history[this.state.stepNumber];
+        const history = this.state.history.slice(0, this.state.stepNumber + 1);
+        const current = history[history.length - 1];
         const squares = current.squares.slice();
         const y = getY(i);
         const x = getX(i, y);
@@ -105,8 +105,8 @@ class Game extends React.Component {
     }
 
     render() {
-        let history = this.state.history.slice(0, this.state.stepNumber + 1);
-        const current = history[history.length - 1];
+        let history = this.state.history;
+        const current = history[this.state.stepNumber];
         const resultGame = calculateWinner(current.squares);
         const winner = resultGame ? resultGame[0] : null;
         const line_winner = resultGame ? resultGame[1] : null;
@@ -117,16 +117,18 @@ class Game extends React.Component {
                 'Revenir au début de la partie';
             return (
                 <li key={move} className={move === this.state.stepNumber ? "current_elt_history" : ""}>
-                    <button onClick={() => this.jumpTo(move)}>{desc}</button><span>{history[move].coords[0] !== null ? `(${history[move].coords[0]}, ${history[move].coords[1]})` : ""}</span>
+                    <div id="grid_move">
+                        <button onClick={() => this.jumpTo(move)}>{desc}</button><span>{history[move].coords[0] !== null ? `(${history[move].coords[0]}, ${history[move].coords[1]})` : ""}</span>
+                    </div>
                 </li>
             )
         });
 
         let status;
         console.log("render" + this.state.isDraw);
-        if (winner && !this.state.isDraw) {
+        if (winner) {
             status = 'Gagnant : ' + winner;
-        } else if (this.state.isDraw) {
+        } else if (this.state.isDraw && !winner) {
             status = 'Draw';
         } else {
             status = 'Prochain joueur : ' + (this.state.xIsNext ? 'X' : 'O');
@@ -135,6 +137,7 @@ class Game extends React.Component {
         return (
             <div className="game">
                 <div className="game-board">
+                    <h1>Morpion</h1>
                     <Board
                         squares={current.squares}
                         onClick={(i) => this.handleClick(i)}
@@ -142,6 +145,7 @@ class Game extends React.Component {
                     />
                 </div>
                 <div className="game-info">
+                    <h1>Historique</h1>
                     <ToggleButton
                         toggleClick={() => this.toggleClick()}
                     />
@@ -193,7 +197,8 @@ function computeIsDraw(squares) {
         console.log(elt);
         if (elt === null) {
             isDraw = false;
-        }}
+        }
+    }
     );
     return isDraw;
 }

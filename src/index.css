@@ -1,11 +1,23 @@
 body {
   font: 14px "Century Gothic", Futura, sans-serif;
-  margin: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+.game {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: 3%;
+  text-align: left;
 }
 
 ol,
 ul {
   padding-left: 30px;
+  list-style-type:none;
 }
 
 .board-row:after {
@@ -121,4 +133,12 @@ input:checked+.slider:before {
 
 .square_win  {
   background-color: black;
+}
+
+#grid_move {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: 3%;
+  text-align: left;
 }
